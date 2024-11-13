@@ -1,4 +1,7 @@
+import { config } from '@gateway/config';
 import { SERVICE_NAME } from '@gateway/constants';
+import { elasticSearch } from '@gateway/elasticsearch';
+import { appRoutes } from '@gateway/routes';
 import { logger } from '@gateway/utils/logger.util';
 import { CustomError, IErrorResponse } from '@jobhunt-microservices/jobhunt-shared';
 import compression from 'compression';
@@ -35,16 +38,16 @@ export class GatewayServer {
     this.app.use(
       cookieSession({
         name: 'session',
-        keys: [],
+        keys: [`${config.SECRET_KEY_ONE}`, `${config.SECRET_KEY_TWO}`],
         maxAge: 24 * 7 * 3600 * 1000,
-        secure: false
+        secure: config.NODE_ENV !== 'development'
       })
     );
     this.app.use(hpp());
     this.app.use(helmet());
     this.app.use(
       cors({
-        origin: '',
+        origin: `${config.CLIENT_URL}`,
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
       })
@@ -57,9 +60,13 @@ export class GatewayServer {
     this.app.use(urlencoded({ extended: true, limit: '200mb' }));
   }
 
-  private routesMiddleware(): void {}
+  private routesMiddleware(): void {
+    appRoutes(this.app);
+  }
 
-  private connectElasticSearch(): void {}
+  private connectElasticSearch(): void {
+    elasticSearch.checkConnection();
+  }
 
   private errorHandler(): void {
     this.app.use('*', (req: Request, res: Response, next: NextFunction) => {

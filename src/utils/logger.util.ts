@@ -1,5 +1,5 @@
-import { winstonLogger } from '@jobhunt-microservices/jobhunt-shared';
 import { config } from '@gateway/config';
+import { winstonLogger } from '@jobhunt-microservices/jobhunt-shared';
 import { Logger } from 'winston';
 
 export const logger = (name: string, level: string) => {
