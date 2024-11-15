@@ -18,7 +18,7 @@
   "description": "",
   "dependencies": {
     "@elastic/elasticsearch": "^8.15.2",
-    "@jobhunt-microservices/jobhunt-shared": "^0.0.9",
+    "@jobhunt-microservices/jobhunt-shared": "^0.0.10",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "compression": "^1.7.5",

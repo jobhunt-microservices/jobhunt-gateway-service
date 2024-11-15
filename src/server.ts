@@ -15,7 +15,6 @@ import helmet from 'helmet';
 import hpp from 'hpp';
 import http from 'http';
 import { StatusCodes } from 'http-status-codes';
-import { axiosAuthInstance } from './services/api/auth.service';
 
 const SERVER_PORT = 4000;
 
@@ -57,9 +56,9 @@ export class GatewayServer {
       })
     );
 
-    this.app.use((req: Request, _: Response, next: NextFunction) => {
+    this.app.use((req: Request, res: Response, next: NextFunction) => {
       if (req.session?.jwt) {
-        axiosAuthInstance.defaults.headers['Authorization'] = `Bearer ${req.session.jwt}`;
+        req.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
       }
       next();
     });

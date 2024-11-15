@@ -20,6 +20,7 @@ module.exports = {
     'prefer-template': ['warn'],
     'space-before-function-paren': [0, { anonymous: 'always', named: 'always' }],
     'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['error', { varsIgnorePattern: '^_', argsIgnorePattern: '^_' }],
     camelcase: 0,
     'no-return-assign': 0,
     quotes: ['error', 'single'],

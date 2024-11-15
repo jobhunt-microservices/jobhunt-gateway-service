@@ -6,8 +6,9 @@ import { StatusCodes } from 'http-status-codes';
 class SignUpController {
   public async create(req: Request, res: Response): Promise<void> {
     const response: AxiosResponse = await authService.signup(req.body);
-    req.session = { jwt: response.data.token };
-    res.status(StatusCodes.CREATED).json({ message: response.data.message, user: response.data.user });
+    const { message, token } = response.data;
+    req.session = { jwt: token };
+    res.status(StatusCodes.CREATED).json({ message });
   }
 }
 
