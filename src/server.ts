@@ -1,9 +1,12 @@
+import 'express-async-errors';
+
 import { config } from '@gateway/config';
 import { SERVICE_NAME } from '@gateway/constants';
 import { elasticSearch } from '@gateway/elasticsearch';
 import { appRoutes } from '@gateway/routes';
 import { logger } from '@gateway/utils/logger.util';
-import { CustomError, IErrorResponse } from '@jobhunt-microservices/jobhunt-shared';
+import { CustomError, getErrorMessage, IErrorResponse } from '@jobhunt-microservices/jobhunt-shared';
+import { isAxiosError } from 'axios';
 import compression from 'compression';
 import cookieSession from 'cookie-session';
 import cors from 'cors';
@@ -12,6 +15,7 @@ import helmet from 'helmet';
 import hpp from 'hpp';
 import http from 'http';
 import { StatusCodes } from 'http-status-codes';
+import { axiosAuthInstance } from './services/api/auth.service';
 
 const SERVER_PORT = 4000;
 
@@ -52,6 +56,13 @@ export class GatewayServer {
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
       })
     );
+
+    this.app.use((req: Request, _: Response, next: NextFunction) => {
+      if (req.session?.jwt) {
+        axiosAuthInstance.defaults.headers['Authorization'] = `Bearer ${req.session.jwt}`;
+      }
+      next();
+    });
   }
 
   private standardMiddleware(): void {
@@ -78,12 +89,22 @@ export class GatewayServer {
       next();
     });
 
-    this.app.use((error: IErrorResponse, _: Request, res: Response, next: NextFunction) => {
-      log.log('error', SERVICE_NAME + ` ${error.comingFrom}:`, error);
+    this.app.use((error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
+      log.log('error', SERVICE_NAME + ` ${error.comingFrom}:`, error.message);
       if (error instanceof CustomError) {
         res.status(error.statusCode).json(error.serializeError());
       }
-      next();
+      if (isAxiosError(error)) {
+        log.log(
+          'error',
+          `GatewayService Axios Error - ${error?.response?.data?.comingFrom}:`,
+          error?.response?.data?.message ?? 'Error occurred.'
+        );
+        res
+          .status(error?.response?.data?.statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR)
+          .json({ message: error?.response?.data?.message ?? 'Error occurred.' });
+      }
+      next(error);
     });
   }
 
@@ -93,7 +114,7 @@ export class GatewayServer {
       this.startHttpServer(httpServer);
       log.info(SERVICE_NAME + ` has started with process id ${process.pid}`);
     } catch (error) {
-      log.log('error', SERVICE_NAME + ` startHttpServer() method:`, error);
+      log.log('error', SERVICE_NAME + ` startServer() method:`, getErrorMessage(error));
     }
   }
 
@@ -103,7 +124,7 @@ export class GatewayServer {
         log.info(SERVICE_NAME + ` has started on port ${SERVER_PORT}`);
       });
     } catch (error) {
-      log.log('error', SERVICE_NAME + ` startHttpServer() method:`, error);
+      log.log('error', SERVICE_NAME + ` startHttpServer() method:`, getErrorMessage(error));
     }
   }
 }

@@ -2,6 +2,7 @@ import { Client } from '@elastic/elasticsearch';
 import { config } from '@gateway/config';
 import { SERVICE_NAME } from '@gateway/constants';
 import { logger } from '@gateway/utils/logger.util';
+import { getErrorMessage } from '@jobhunt-microservices/jobhunt-shared';
 
 const log = logger('apiGatewayElasticSearchConnection', 'debug');
 
@@ -24,7 +25,7 @@ class ElasticSearch {
         isConnected = true;
       } catch (error) {
         log.error(SERVICE_NAME + ' connection to elasticsearch failed, retrying');
-        log.log('error', SERVICE_NAME + ' checkConnection() method:', error);
+        log.log('error', SERVICE_NAME + ' checkConnection() method:', getErrorMessage(error));
       }
     }
   }

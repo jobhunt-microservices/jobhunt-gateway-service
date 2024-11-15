@@ -1,4 +1,4 @@
-import { HealthController } from '@gateway/controllers/health.controller';
+import { healthController } from '@gateway/controllers/health.controller';
 import express, { Router } from 'express';
 
 class HealthRoutes {
@@ -8,7 +8,8 @@ class HealthRoutes {
   }
 
   public routes(): Router {
-    this.router.get('/gateway-health', HealthController.prototype.health);
+    this.router.get('/gateway-health', healthController.health);
+    this.router.get('/auth-health', healthController.healthAuth);
     return this.router;
   }
 }
