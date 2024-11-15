@@ -11,8 +11,8 @@ class AuthRoutes {
   public routes(): Router {
     this.router.post('/auth/signup', authController.create);
     this.router.post('/auth/signin', authController.read);
-    this.router.post('/auth/verify-email', verifyEmailController.update);
 
+    this.router.get('/auth/verify-email', verifyEmailController.verifyEmail);
     return this.router;
   }
 }

@@ -41,12 +41,12 @@ class AuthService {
   }
 
   async verifyEmail(token: string): Promise<AxiosResponse> {
-    const response: AxiosResponse = await this.axiosAuthInstance.put('/verify-email', { token });
+    const response: AxiosResponse = await this.axiosAuthInstance.put(`/verify-email?token=${token}`);
     return response;
   }
 
-  async resendEmail(payload: { authId: number; email: string }) {
-    const response: AxiosResponse = await this.axiosAuthInstance.post('/resend-email', payload);
+  async resendEmail() {
+    const response: AxiosResponse = await this.axiosAuthInstance.post('/resend-email');
     return response;
   }
 

@@ -4,8 +4,8 @@ import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 class VerifyEmailController {
-  public async update(req: Request, res: Response): Promise<void> {
-    const response: AxiosResponse = await authService.verifyEmail(req.body);
+  public async verifyEmail(req: Request, res: Response): Promise<void> {
+    const response: AxiosResponse = await authService.verifyEmail(req.query?.token as string);
     const { message } = response.data;
     res.status(StatusCodes.OK).json({ message });
   }

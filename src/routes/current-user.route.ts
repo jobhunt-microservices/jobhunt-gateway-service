@@ -10,7 +10,7 @@ class CurrentUserRoutes {
 
   public routes(): Router {
     this.router.get('/auth/current-user', authMiddleware.checkAuthentication, currentUserController.read);
-    this.router.post('/auth/resend-email', currentUserController.resendEmail);
+    this.router.post('/auth/resend-email', authMiddleware.checkAuthentication, currentUserController.resendEmail);
 
     return this.router;
   }
