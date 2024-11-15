@@ -15,6 +15,7 @@ import helmet from 'helmet';
 import hpp from 'hpp';
 import http from 'http';
 import { StatusCodes } from 'http-status-codes';
+import { authService } from './services/api/auth.service';
 
 const SERVER_PORT = 4000;
 
@@ -59,6 +60,7 @@ export class GatewayServer {
     this.app.use((req: Request, res: Response, next: NextFunction) => {
       if (req.session?.jwt) {
         req.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
+        authService.axiosAuthInstance.defaults.headers['Authorization'] = `Bearer ${req.session?.jwt}`;
       }
       next();
     });

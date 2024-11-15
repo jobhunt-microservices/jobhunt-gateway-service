@@ -1,5 +1,5 @@
-import { signInController } from '@gateway/controllers/auth/signin.auth.controller';
-import { signUpController } from '@gateway/controllers/auth/signup.auth.controller';
+import { authController } from '@gateway/controllers/auth/auth.controller';
+import { verifyEmailController } from '@gateway/controllers/auth/verify-email.controller';
 import express, { Router } from 'express';
 
 class AuthRoutes {
@@ -9,8 +9,10 @@ class AuthRoutes {
   }
 
   public routes(): Router {
-    this.router.post('/auth/signup', signUpController.create);
-    this.router.post('/auth/signin', signInController.read);
+    this.router.post('/auth/signup', authController.create);
+    this.router.post('/auth/signin', authController.read);
+    this.router.post('/auth/verify-email', verifyEmailController.update);
+
     return this.router;
   }
 }
