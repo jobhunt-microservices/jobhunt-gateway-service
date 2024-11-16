@@ -4,6 +4,7 @@ import { config } from '@gateway/config';
 import { SERVICE_NAME } from '@gateway/constants';
 import { elasticSearch } from '@gateway/elasticsearch';
 import { appRoutes } from '@gateway/routes';
+import { authService } from '@gateway/services/api/auth.service';
 import { logger } from '@gateway/utils/logger.util';
 import { CustomError, getErrorMessage, IErrorResponse } from '@jobhunt-microservices/jobhunt-shared';
 import { isAxiosError } from 'axios';
@@ -15,7 +16,6 @@ import helmet from 'helmet';
 import hpp from 'hpp';
 import http from 'http';
 import { StatusCodes } from 'http-status-codes';
-import { authService } from './services/api/auth.service';
 
 const SERVER_PORT = 4000;
 
