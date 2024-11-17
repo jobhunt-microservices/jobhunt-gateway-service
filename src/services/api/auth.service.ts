@@ -60,17 +60,17 @@ class AuthService {
     return response;
   }
 
-  async getGigs(query: string, from: string, size: string, type: string): Promise<AxiosResponse> {
-    const response: AxiosResponse = await this.axiosAuthInstance.get(`/search/gig/${from}/${size}/${type}?${query}`);
+  async gigsSearch(query: string, from: string, size: string, type: string): Promise<AxiosResponse> {
+    const response: AxiosResponse = await this.axiosAuthInstance.get(`/gigs/search/${from}/${size}/${type}?${query}`);
     return response;
   }
 
-  async getGig(gigId: string): Promise<AxiosResponse> {
-    const response: AxiosResponse = await this.axiosAuthInstance.get(`/search/gig/${gigId}`);
+  async singleGigSearchById(id: string): Promise<AxiosResponse> {
+    const response: AxiosResponse = await this.axiosAuthInstance.get(`/gigs/search/${id}`);
     return response;
   }
 
-  async seed(count: string): Promise<AxiosResponse> {
+  async createSeedData(count: string): Promise<AxiosResponse> {
     const response: AxiosResponse = await this.axiosAuthInstance.put(`/seed/${count}`);
     return response;
   }
