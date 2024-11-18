@@ -1,3 +1,4 @@
+import { redisConnect } from '@gateway/redis/connection';
 import { GatewayServer } from '@gateway/server';
 import express, { Express } from 'express';
 
@@ -6,6 +7,8 @@ class Application {
     const app: Express = express();
     const server = new GatewayServer(app);
     server.start();
+
+    redisConnect();
   }
 }
 

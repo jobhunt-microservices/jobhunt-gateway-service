@@ -5,8 +5,10 @@ import { SERVICE_NAME } from '@gateway/constants';
 import { elasticSearch } from '@gateway/elasticsearch';
 import { appRoutes } from '@gateway/routes';
 import { authService } from '@gateway/services/api/auth.service';
+import { SocketIOAppHandler } from '@gateway/sockets/socket';
 import { logger } from '@gateway/utils/logger.util';
 import { CustomError, getErrorMessage, IErrorResponse } from '@jobhunt-microservices/jobhunt-shared';
+import { createAdapter } from '@socket.io/redis-adapter';
 import { isAxiosError } from 'axios';
 import compression from 'compression';
 import cookieSession from 'cookie-session';
@@ -16,10 +18,14 @@ import helmet from 'helmet';
 import hpp from 'hpp';
 import http from 'http';
 import { StatusCodes } from 'http-status-codes';
+import { createClient } from 'redis';
+import { Server } from 'socket.io';
 
 const SERVER_PORT = 4000;
 
 const log = logger('gatewayServer', 'debug');
+
+export let socketIO: Server;
 
 export class GatewayServer {
   private app: Application;
@@ -110,10 +116,27 @@ export class GatewayServer {
     });
   }
 
+  private async createSocketIO(httpServer: http.Server): Promise<Server> {
+    const io: Server = new Server(httpServer, {
+      cors: {
+        origin: `${config.CLIENT_URL}`,
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+      }
+    });
+    const pubClient = createClient({ url: config.REDIS_HOST });
+    const subClient = pubClient.duplicate();
+    await Promise.all([pubClient.connect(), subClient.connect()]);
+    io.adapter(createAdapter(pubClient, subClient));
+    socketIO = io;
+    return io;
+  }
+
   private async startServer(): Promise<void> {
     try {
       const httpServer: http.Server = new http.Server(this.app);
+      const socketIO = await this.createSocketIO(httpServer);
       this.startHttpServer(httpServer);
+      this.socketIOConnections(socketIO);
       log.info(SERVICE_NAME + ` has started with process id ${process.pid}`);
     } catch (error) {
       log.log('error', SERVICE_NAME + ` startServer() method:`, getErrorMessage(error));
@@ -128,5 +151,10 @@ export class GatewayServer {
     } catch (error) {
       log.log('error', SERVICE_NAME + ` startHttpServer() method:`, getErrorMessage(error));
     }
+  }
+
+  private socketIOConnections(io: Server): void {
+    const socketIoApp = new SocketIOAppHandler(io);
+    socketIoApp.listen();
   }
 }
