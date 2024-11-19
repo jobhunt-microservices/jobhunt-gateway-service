@@ -9,7 +9,6 @@ class HealthRoutes {
 
   public routes(): Router {
     this.router.get('/gateway-health', healthController.health);
-    this.router.get('/auth/auth-health', healthController.healthAuth);
     return this.router;
   }
 }

@@ -134,9 +134,10 @@ export class GatewayServer {
   private async startServer(): Promise<void> {
     try {
       const httpServer: http.Server = new http.Server(this.app);
-      const socketIO = await this.createSocketIO(httpServer);
+      // const socketIO = await this.createSocketIO(httpServer);
+      // this.socketIOConnections(socketIO);
+
       this.startHttpServer(httpServer);
-      this.socketIOConnections(socketIO);
       log.info(SERVICE_NAME + ` has started with process id ${process.pid}`);
     } catch (error) {
       log.log('error', SERVICE_NAME + ` startServer() method:`, getErrorMessage(error));
